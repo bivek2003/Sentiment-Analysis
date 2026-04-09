@@ -2,3 +2,5 @@
 .DS_Store
 aclImdb/
 aclImdb_v1.tar.gz
+movie_data.csv
+.ipynb_checkpoints/
