@@ -108,7 +108,7 @@ The best single dropout configuration was **p1 = 0.5, p2 = 0.5**.
 
 **Analysis.** Adding dropout improves test accuracy by **0.57 percentage points** (0.8890 → 0.8947) at essentially zero extra training cost. Dropout layers are cheap, and the wall-clock time is statistically identical (147.1 s vs 150.0 s). Train accuracy stays effectively at 1.0 in both cases, but the dropout model generalizes slightly better because each forward pass during training operates on a different subnetwork, which discourages neurons from co-adapting to specific tf-idf features. The accuracy gain is consistent across all three (p1, p2) settings, which suggests that dropout is helping in a robust, configuration-insensitive way; the highest dropout rate (0.5/0.5) is best, indicating that the baseline network has substantial excess capacity to regularize away.
 
-#### Task 5.2 — Bagging Ensemble of Dropout Models
+#### Task 5.2 : Bagging Ensemble of Dropout Models
 
 The bagging ensemble uses **five** different dropout configurations: (0.3, 0.2), (0.4, 0.2), (0.5, 0.3), (0.5, 0.5), and (0.6, 0.4). For each model i, a bootstrap sample of size 35,000 is drawn with replacement from the training set using `np.random.seed(i)`, wrapped in a `SubsetRandomSampler`, and used to train an independent `FNN_Dropout` for 10 epochs. At inference time, the five models predict probabilities for each test sample; the probabilities are averaged and thresholded at 0.5 (soft voting) to produce the ensemble prediction.
 
