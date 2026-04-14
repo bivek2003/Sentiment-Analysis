@@ -1,6 +1,7 @@
 ## Assignment 3: Sentiment Analysis using Feedforward Neural Networks
 
 **Author: Bivek Panthi & Roman Balayar**
+
 **April 13, 2026, University of New Mexico**
 
 ### Introduction
