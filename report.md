@@ -41,7 +41,7 @@ FNN_Baseline
 
 Both networks use Binary Cross-Entropy loss (`nn.BCELoss`) on the sigmoid output and are optimized with `torch.optim.Adam`. A prediction is positive when the sigmoid output is ≥ 0.5. The choice of Adam over SGD was deliberate. Early experiments with SGD converged much more slowly on the very high-dimensional sparse input.
 
-### Task 3 — Baseline Training and Hyperparameter Tuning
+### Task 3 : Baseline Training and Hyperparameter Tuning
 
 The baseline `FNN_Large` model was trained for 10 epochs with a batch size of 256. Three combinations of learning rate and weight decay (L2 regularization) were evaluated by exhaustive comparison.
 
@@ -64,13 +64,13 @@ The configuration **lr = 0.0005, weight_decay = 1e-5** gave the best final test 
 | FNN_Large [256→128→64], lr=0.0005 | 0.890 | 180.6 s |
 | FNN_Large [256→128→64], lr=0.01   | 0.886 | 197.6 s |
 
-**Analysis.** The tuned FNN reaches accuracy essentially on par with the textbook logistic regression model (0.890 vs 0.899) while training in roughly **3 minutes** — comparable to or faster than the book's logistic regression grid search, which the textbook reports at 5–10 minutes. Peak test accuracy in the first two epochs (0.9072) exceeds the logistic regression baseline, indicating that the FNN can match a strong linear model on tf-idf features. Still, the very wide input layer (89,509 → 256) gives the network enough capacity to memorize the training set quickly. The lr=0.0005 setting smooths the optimization enough that the early epochs land at a better generalization point than the more aggressive 0.001 and 0.01 settings.
+**Analysis.** The tuned FNN reaches accuracy essentially on par with the textbook logistic regression model (0.890 vs 0.899) while training in roughly **3 minutes**,  comparable to or faster than the book's logistic regression grid search, which the textbook reports at 5–10 minutes. Peak test accuracy in the first two epochs (0.9072) exceeds the logistic regression baseline, indicating that the FNN can match a strong linear model on tf-idf features. Still, the very wide input layer (89,509 → 256) gives the network enough capacity to memorize the training set quickly. The lr=0.0005 setting smooths the optimization enough that the early epochs land at a better generalization point than the more aggressive 0.001 and 0.01 settings.
 
-### Task 4 — k-Fold Cross Validation
+### Task 4 : k-Fold Cross Validation
 
 PyTorch does not directly support k-fold cross-validation, so we implemented it manually on top of `sklearn.model_selection.KFold`. The training and test datasets are first concatenated with `ConcatDataset`, then `KFold(n_splits=k, shuffle=True, random_state=42)` produces fold indices that are wrapped in `SubsetRandomSampler` and handed to two `DataLoader` instances (one for the in-fold training data, one for the held-out fold). For each fold, a fresh `FNN_Large` is instantiated, weights are reset via `reset_parameters`, and the network is trained for 10 epochs with the tuned hyperparameters (lr = 0.0005, weight_decay = 1e-5). After training, train and test accuracy are computed for that fold; the final reported accuracy is the average across folds. We tuned k by trying k = 3, 5, and 10.
 
-**Table 3: k-Fold Cross Validation vs. Baseline**
+**Table 3 : k-Fold Cross Validation vs. Baseline**
 
 | Model | Train Acc | Test Acc | Total Time |
 |---|---:|---:|---:|
@@ -81,15 +81,15 @@ PyTorch does not directly support k-fold cross-validation, so we implemented it 
 
 **Analysis.** All three k-fold settings produce test accuracy higher than the single-split baseline (0.8867 / 0.8858 / 0.8838 vs. 0.8749), confirming that the cross-validated estimate is both more stable and slightly more optimistic as each fold trains on more data (≈ 47k vs 35k samples) than the single-split baseline, which explains most of the improvement. Among the three k values, **k = 3** gave the best average test accuracy and is also the fastest (≈ 377 s vs. 1744 s for k = 10). Time cost grows almost linearly with k because each additional fold is one more full training run; k = 10 takes roughly 10× the single-fold time. Train accuracy is essentially saturated (1.0000 for k = 3 and k = 5; 0.9982 for k = 10), which again reflects how easily the wide network memorizes the training partition. Given the marginal accuracy differences, **k = 3 is the preferred trade-off** here: the gain over k = 5 or k = 10 is well within fold-to-fold noise, but the wall-clock saving is large.
 
-### Task 5 — Dropout Regularization
+### Task 5 : Dropout Regularization
 
 For Task 5, we returned to the smaller `FNN_Baseline` ([128 → 64]) so that the dropout study mirrors the book's scale. Three runs are compared in this section: a baseline FNN with no dropout and no weight decay; a single FNN with dropout layers inserted after each ReLU; and a bagging ensemble of five dropout FNNs trained on bootstrap samples. All three were trained with lr = 0.0005 for 10 epochs.
 
-#### Task 5.1 — Single Dropout Model
+#### Task 5.1 : Single Dropout Model
 
 `FNN_Dropout` inserts `nn.Dropout(p1)` after the first hidden layer and `nn.Dropout(p2)` after the second hidden layer. Three (p1, p2) configurations were tuned.
 
-**Table 4: Single Dropout Model — Hyperparameter Sweep**
+**Table 4 : Single Dropout Model — Hyperparameter Sweep**
 
 | Dropout (p1, p2) | Train Acc | Test Acc | Time |
 |---|---:|---:|---:|
@@ -99,7 +99,7 @@ For Task 5, we returned to the smaller `FNN_Baseline` ([128 → 64]) so that the
 
 The best single dropout configuration was **p1 = 0.5, p2 = 0.5**.
 
-**Table 5: Single Dropout vs. Baseline**
+**Table 5 : Single Dropout vs. Baseline**
 
 | Model | Train Acc | Test Acc | Time |
 |---|---:|---:|---:|
@@ -137,7 +137,7 @@ The bagging ensemble uses **five** different dropout configurations: (0.3, 0.2),
 The full set of experiments produces a coherent picture of how each technique interacts with this tf-idf sentiment task:
 
 - **Tuning alone** (Task 3) is sufficient to bring a wide FNN into the same accuracy band as the textbook logistic regression model (≈ 0.89–0.91), in roughly 3 minutes of wall-clock training.
-- **k-Fold cross-validation** (Task 4) gives a more reliable estimate of generalization and yields slightly higher test accuracy than a single 70/30 split, mostly because each fold trains on more data. k = 3 is the sweet spot — k = 5 and k = 10 buy almost no additional accuracy but cost 2× and 4.6× more time, respectively.
+- **k-Fold cross-validation** (Task 4) gives a more reliable estimate of generalization and yields slightly higher test accuracy than a single 70/30 split, mostly because each fold trains on more data. k = 3 is the sweet spot  k = 5 and k = 10 buy almost no additional accuracy but cost 2× and 4.6× more time, respectively.
 - **Single dropout** (Task 5.1) modestly improves test accuracy at no time cost. The gain (≈ 0.6 pp) is consistent across dropout rates, with the highest rate (0.5/0.5) giving the best result, confirming that the baseline FNN has substantial excess capacity.
 - **Bagging an ensemble of dropout models** (Task 5.2) is the strongest approach overall and the only configuration to break **0.90 test accuracy**. Combining bootstrap-sample diversity with dropout-architecture diversity produces models whose errors are decorrelated enough that soft voting yields a real gain over any single member.
 
